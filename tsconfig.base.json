@@ -15,7 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@monorepo/interfaces": ["interfaces/src/index.ts"]
+      "@monorepo/interfaces": ["interfaces/src/index.ts"],
+      "@monorepo/schemas": ["schemas/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

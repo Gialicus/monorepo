@@ -7,6 +7,11 @@
   "dependencies": {
     "@fastify/autoload": "~5.7.1",
     "@fastify/sensible": "~5.2.0",
+    "@fastify/type-provider-json-schema-to-ts": "^2.2.2",
+    "@temporalio/activity": "^1.8.6",
+    "@temporalio/client": "^1.8.6",
+    "@temporalio/worker": "^1.8.6",
+    "@temporalio/workflow": "^1.8.6",
     "axios": "^1.0.0",
     "fastify": "~4.13.0",
     "fastify-plugin": "~4.5.0",
