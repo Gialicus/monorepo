@@ -7,6 +7,6 @@ export interface MongoPluginOptions {
 export default fp<MongoPluginOptions>(async (fastify, opts) => {
   fastify.register(import('@fastify/mongodb'), {
     forceClose: true,
-    url: opts.uri || 'mongodb://mongo/mydb',
+    url: opts.uri || 'mongodb://localhost:27017/mydb',
   });
 });
