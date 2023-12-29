@@ -1,16 +1,27 @@
 import { NativeConnection, Worker } from '@temporalio/worker';
 import { registerUserActivityFactory } from './activities';
+import { MongoClient } from 'mongodb';
+import { createTransport } from 'nodemailer';
 
 async function run() {
   const connection = await NativeConnection.connect({
-    address: 'localhost:7233',
+    address: process.env.TEMPORAL_SERVER_ADDRESS,
+  });
+  const client = new MongoClient(process.env.MONGO_URI);
+  const transport = createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT),
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
   });
   const worker = await Worker.create({
     connection,
     namespace: 'default',
     taskQueue: 'register-user',
     workflowsPath: require.resolve('./workflows'),
-    activities: registerUserActivityFactory(),
+    activities: registerUserActivityFactory(client, transport),
   });
   await worker.run();
 }

@@ -16,16 +16,21 @@ const {
   },
 });
 
-export type RegisterUserInput = {
+type RegisterUserInput = {
   email: string;
   password: string;
+};
+
+type RegisterUserOutput = {
+  status: string;
 };
 
 export const activateUserSignal = workflow.defineSignal('activateUserSignal');
 export const isActiveUserQuery = workflow.defineQuery('isActiveUserQuery');
 
-/** A workflow that simply calls an activity */
-export async function registerUser(input: RegisterUserInput): Promise<string> {
+export async function registerUser(
+  input: RegisterUserInput
+): Promise<RegisterUserOutput> {
   await checkUserNotExists(input.email);
   const password = await hashPassword(input.password, 'super_secret');
   await createUser(input.email, password);
@@ -34,10 +39,11 @@ export async function registerUser(input: RegisterUserInput): Promise<string> {
   workflow.setHandler(activateUserSignal, () => {
     isActive = true;
   });
+  workflow.setHandler(isActiveUserQuery, () => isActive);
   if (await workflow.condition(() => isActive, 1000 * 60 * 3)) {
     await activateUser('');
   } else {
     await deactivateUser('');
   }
-  return 'done';
+  return { status: 'done' };
 }
