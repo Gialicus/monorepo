@@ -9,7 +9,7 @@ export type RegisterUserOutput = {
   status: string;
 };
 
-export declare function registerUser(
+export declare function registerUserWorkflow(
   input: RegisterUserInput
 ): Promise<RegisterUserOutput>;
 

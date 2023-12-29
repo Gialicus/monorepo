@@ -23,7 +23,7 @@ export function subscriptionActivityFactory(
         status: 'active',
         trialPeriod: '5 minutes',
         billingPeriod: '10 minutes',
-        credit: 0,
+        extraPeriod: '2 minutes',
       };
       const trial = await createWithTimestamp<typeof payload>(
         client.db().collection(MONGO_COLLECTIONS.SUBSCRIPTIONS)
@@ -45,6 +45,15 @@ export function subscriptionActivityFactory(
         to: email,
         subject: 'Cancellazione sottoscrizione',
         html: `Gentile utente hai cancellato la tua sottoscrizione`,
+      };
+      await transporter.sendMail(mailOptions);
+    },
+    sendSubscriptionRenewalMail: async (email: string) => {
+      const mailOptions: SendMailOptions = {
+        from: 'noreply@platform.com',
+        to: email,
+        subject: 'Rinnovo sottoscrizione',
+        html: `Gentile utente hai rinnovato la tua sottoscrizione`,
       };
       await transporter.sendMail(mailOptions);
     },

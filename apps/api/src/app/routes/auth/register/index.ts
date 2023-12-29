@@ -4,7 +4,7 @@ import { IdSchema, LoginSchema } from '@monorepo/schemas';
 import {
   REGISTER_USER_QUEUE,
   activateUserSignal,
-  registerUser,
+  registerUserWorkflow,
 } from '@monorepo/interfaces';
 import { uuid4 } from '@temporalio/workflow';
 
@@ -20,7 +20,7 @@ const register: FastifyPluginAsync = async (fastify): Promise<void> => {
     async function (request) {
       const { email, password } = request.body;
       const handle = await app.temporal.workflow.start(
-        registerUser ?? 'registerUser',
+        registerUserWorkflow ?? 'registerUserWorkflow',
         {
           taskQueue: REGISTER_USER_QUEUE,
           args: [

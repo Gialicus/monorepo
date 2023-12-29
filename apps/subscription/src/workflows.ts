@@ -2,13 +2,17 @@ import * as workflow from '@temporalio/workflow';
 import { subscriptionActivityFactory } from './activities';
 import { SubscriptionPeriod } from '@monorepo/interfaces';
 
-const { startTrialPeriod, sendWelcomeMail, sendSubscriptionCancellationMail } =
-  workflow.proxyActivities<ReturnType<typeof subscriptionActivityFactory>>({
-    startToCloseTimeout: '1 minute',
-    retry: {
-      nonRetryableErrorTypes: ['DuplicateNotAllowed'],
-    },
-  });
+const {
+  startTrialPeriod,
+  sendWelcomeMail,
+  sendSubscriptionCancellationMail,
+  sendSubscriptionRenewalMail,
+} = workflow.proxyActivities<ReturnType<typeof subscriptionActivityFactory>>({
+  startToCloseTimeout: '1 minute',
+  retry: {
+    nonRetryableErrorTypes: ['DuplicateNotAllowed'],
+  },
+});
 
 //Keep it in sync with interface and don't import from external sources
 type SubscriptionInput = {
@@ -22,24 +26,20 @@ type SubscriptionOutput = {
 //Keep it in sync with interface and don't import from external sources
 const cancelSignal = workflow.defineSignal('cancelSignal');
 //Keep it in sync with interface and don't import from external sources
-const addCreditSignal = workflow.defineSignal('addCreditSignal');
+const payedSignal = workflow.defineSignal('payedSignal');
 
 async function billingCycle(customer: SubscriptionPeriod) {
   let isCanceled = false;
+  let isPayed = false;
   workflow.setHandler(cancelSignal, () => void (isCanceled = true));
-  workflow.setHandler(addCreditSignal, () => void (customer.credit += 50));
-  while (customer.credit > 0) {
-    const isCanceledOrExpired = await workflow.condition(
-      () => isCanceled,
-      customer.billingPeriod
-    );
-    if (!isCanceledOrExpired) {
-      customer.credit -= 50;
+  workflow.setHandler(payedSignal, () => void (isPayed = true));
+  while (await workflow.condition(() => isCanceled, customer.billingPeriod)) {
+    if (await workflow.condition(() => isPayed, customer.extraPeriod)) {
+      await sendSubscriptionRenewalMail(customer.email);
     } else {
-      break;
+      await sendSubscriptionCancellationMail(customer.email);
     }
   }
-  await sendSubscriptionCancellationMail(customer.email);
 }
 
 export async function subscriptionWorkflow(

@@ -7,5 +7,5 @@ export type SubscriptionPeriod = {
   status: 'active' | 'inactive';
   trialPeriod: Duration;
   billingPeriod: Duration;
-  credit: number;
+  extraPeriod: Duration;
 };
