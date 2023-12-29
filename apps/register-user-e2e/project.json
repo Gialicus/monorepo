@@ -1,14 +1,14 @@
 {
-  "name": "workers-e2e",
+  "name": "register-user-e2e",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "implicitDependencies": ["workers"],
+  "implicitDependencies": ["register-user"],
   "projectType": "application",
   "targets": {
     "e2e": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{e2eProjectRoot}"],
       "options": {
-        "jestConfig": "apps/workers-e2e/jest.config.ts",
+        "jestConfig": "apps/register-user-e2e/jest.config.ts",
         "passWithNoTests": true
       }
     },

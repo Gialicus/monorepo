@@ -1,4 +1,4 @@
-export const CreateUserSchema = {
+export const LoginSchema = {
   type: 'object',
   properties: {
     email: { type: 'string' },

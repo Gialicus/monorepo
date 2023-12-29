@@ -1,6 +1,6 @@
 /* eslint-disable */
 export default {
-  displayName: 'workers-e2e',
+  displayName: 'register-user-e2e',
   preset: '../..//jest.preset.js',
   setupFiles: ['<rootDir>/src/test-setup.ts'],
   testEnvironment: 'node',
@@ -13,5 +13,5 @@ export default {
     ],
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
-  coverageDirectory: '../..//coverage/workers-e2e',
+  coverageDirectory: '../..//coverage/register-user-e2e',
 };
