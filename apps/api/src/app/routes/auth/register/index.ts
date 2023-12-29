@@ -1,7 +1,11 @@
 import { FastifyPluginAsync } from 'fastify';
 import { JsonSchemaToTsProvider } from '@fastify/type-provider-json-schema-to-ts';
 import { IdSchema, LoginSchema } from '@monorepo/schemas';
-import { REGISTER_USER_QUEUE, registerUser } from '@monorepo/interfaces';
+import {
+  REGISTER_USER_QUEUE,
+  activateUserSignal,
+  registerUser,
+} from '@monorepo/interfaces';
 import { uuid4 } from '@temporalio/workflow';
 
 const register: FastifyPluginAsync = async (fastify): Promise<void> => {
@@ -40,7 +44,9 @@ const register: FastifyPluginAsync = async (fastify): Promise<void> => {
     },
     async function (request) {
       const { id } = request.params;
-      return id;
+      const handle = app.temporal.workflow.getHandle(id);
+      await handle.signal(activateUserSignal);
+      return { workflow: handle.workflowId };
     }
   );
 };
