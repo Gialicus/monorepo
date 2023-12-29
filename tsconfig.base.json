@@ -15,6 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@monorepo/database": ["database/src/index.ts"],
       "@monorepo/interfaces": ["interfaces/src/index.ts"],
       "@monorepo/schemas": ["schemas/src/index.ts"]
     }

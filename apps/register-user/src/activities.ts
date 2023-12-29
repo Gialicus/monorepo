@@ -1,7 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { MongoClient } from 'mongodb';
 import { createHash } from 'node:crypto';
+import { Transporter } from 'nodemailer';
 
-export function registerUserActivityFactory() {
+export function registerUserActivityFactory(
+  client: MongoClient,
+  transporter: Transporter
+) {
   return {
     checkUserNotExists: async (email: string) => {},
     hashPassword: async (password: string, salt: string) => {
