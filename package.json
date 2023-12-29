@@ -6,6 +6,7 @@
   "private": true,
   "dependencies": {
     "@fastify/autoload": "~5.7.1",
+    "@fastify/jwt": "^7.2.4",
     "@fastify/mongodb": "^8.0.0",
     "@fastify/sensible": "~5.2.0",
     "@fastify/type-provider-json-schema-to-ts": "^2.2.2",
