@@ -1,7 +1,7 @@
 {
-  "name": "workers",
+  "name": "register-user",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/workers/src",
+  "sourceRoot": "apps/register-user/src",
   "projectType": "application",
   "targets": {
     "build": {
@@ -10,12 +10,12 @@
       "defaultConfiguration": "production",
       "options": {
         "platform": "node",
-        "outputPath": "dist/apps/workers",
+        "outputPath": "dist/apps/register-user",
         "format": ["cjs"],
         "bundle": false,
-        "main": "apps/workers/src/main.ts",
-        "tsConfig": "apps/workers/tsconfig.app.json",
-        "assets": ["apps/workers/src/assets"],
+        "main": "apps/register-user/src/main.ts",
+        "tsConfig": "apps/register-user/tsconfig.app.json",
+        "assets": ["apps/register-user/src/assets"],
         "generatePackageJson": true,
         "esbuildOptions": {
           "sourcemap": true,
@@ -40,14 +40,14 @@
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "workers:build"
+        "buildTarget": "register-user:build"
       },
       "configurations": {
         "development": {
-          "buildTarget": "workers:build:development"
+          "buildTarget": "register-user:build:development"
         },
         "production": {
-          "buildTarget": "workers:build:production"
+          "buildTarget": "register-user:build:production"
         }
       }
     },
@@ -59,7 +59,7 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "apps/workers/jest.config.ts"
+        "jestConfig": "apps/register-user/jest.config.ts"
       }
     }
   },
