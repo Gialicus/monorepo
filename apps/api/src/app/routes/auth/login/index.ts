@@ -2,14 +2,7 @@ import { FastifyPluginAsync } from 'fastify';
 import { JsonSchemaToTsProvider } from '@fastify/type-provider-json-schema-to-ts';
 import { LoginSchema } from '@monorepo/schemas';
 import { MONGO_COLLECTIONS } from '@monorepo/interfaces';
-import { createHash } from 'node:crypto';
-
-function hashPassword(password) {
-  const hash = createHash('sha256');
-  hash.update(password + process.env.SALT_KEY);
-  const hashedPassword = hash.digest('hex');
-  return hashedPassword;
-}
+import { hashPassword } from '@monorepo/database';
 
 const login: FastifyPluginAsync = async (fastify): Promise<void> => {
   const app = fastify.withTypeProvider<JsonSchemaToTsProvider>();
@@ -25,7 +18,10 @@ const login: FastifyPluginAsync = async (fastify): Promise<void> => {
       const user = await fastify.mongo.db
         .collection(MONGO_COLLECTIONS.USERS)
         .findOne({ email });
-      if (!user || user.password !== hashPassword(password)) {
+      if (
+        !user ||
+        user.password !== hashPassword(password, process.env.SALT_KEY)
+      ) {
         throw fastify.httpErrors.unauthorized;
       }
       return { token: fastify.jwt.sign({ email }) };

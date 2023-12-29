@@ -2,6 +2,7 @@ import {
   createWithTimestamp,
   deleteById,
   findById,
+  hashPassword as hp,
   updateWithTimestamp,
 } from '@monorepo/database';
 import {
@@ -10,7 +11,6 @@ import {
   NotFoundError,
 } from '@monorepo/interfaces';
 import { MongoClient } from 'mongodb';
-import { createHash } from 'node:crypto';
 import { SendMailOptions, Transporter } from 'nodemailer';
 
 export function registerUserActivityFactory(
@@ -26,10 +26,7 @@ export function registerUserActivityFactory(
       if (user) throw new DuplicateNotAllowed(`${email} already taken`);
     },
     hashPassword: async (password: string) => {
-      const hash = createHash('sha256');
-      hash.update(password + process.env.SALT_KEY);
-      const hashedPassword = hash.digest('hex');
-      return hashedPassword;
+      return hp(password, process.env.SALT_KEY);
     },
     createUser: async (email: string, hashedPassword: string) => {
       const user = {
