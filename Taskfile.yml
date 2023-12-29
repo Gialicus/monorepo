@@ -1,0 +1,9 @@
+version: '3'
+
+tasks:
+  lib:
+    cmds:
+      - npx nx run-many -t build interfaces database schemas
+  api:
+    cmds:
+      - npx nx run api:serve
