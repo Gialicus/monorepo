@@ -2,7 +2,8 @@ import { Collection, ObjectId } from 'mongodb';
 import { findById } from './find-by-id';
 
 export function updateWithTimestamp<T = Record<string, unknown>>(
-  collection: Collection
+  collection: Collection,
+  fullDocument = true
 ) {
   return async function (id: string | ObjectId, payload: T) {
     const _id = typeof id === 'string' ? new ObjectId(id) : id;
@@ -16,7 +17,11 @@ export function updateWithTimestamp<T = Record<string, unknown>>(
         $set: data,
       }
     );
-    const updated = await findById(collection)(_id);
-    return updated;
+    if (fullDocument) {
+      const updated = await findById(collection)(_id);
+      return updated;
+    } else {
+      return { _id };
+    }
   };
 }

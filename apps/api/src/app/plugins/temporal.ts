@@ -7,7 +7,7 @@ export interface TemporalPluginOptions {
 
 export default fp<TemporalPluginOptions>(async (fastify, opts) => {
   const connection = await Connection.connect({
-    address: opts.address || 'localhost:7233',
+    address: opts.address || process.env.TEMPORAL_SERVER_ADDRESS,
   });
   const client = new Client({
     connection,

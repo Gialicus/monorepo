@@ -7,3 +7,12 @@ tasks:
   api:
     cmds:
       - npx nx run api:serve
+
+  register-user:
+    cmds:
+      - npx nx run register-user:build && node ./dist/apps/register-user/main
+
+  all:
+    cmds:
+      - npx nx run-many -t serve api register-user
+

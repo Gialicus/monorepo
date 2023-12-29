@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   createWithTimestamp,
   deleteById,
@@ -10,7 +9,7 @@ import {
   MONGO_COLLECTIONS,
   NotFoundError,
 } from '@monorepo/interfaces';
-import { MongoClient, ObjectId } from 'mongodb';
+import { MongoClient } from 'mongodb';
 import { createHash } from 'node:crypto';
 import { SendMailOptions, Transporter } from 'nodemailer';
 
@@ -26,9 +25,9 @@ export function registerUserActivityFactory(
         .findOne({ email });
       if (user) throw new DuplicateNotAllowed(`${email} already taken`);
     },
-    hashPassword: async (password: string, salt: string) => {
+    hashPassword: async (password: string) => {
       const hash = createHash('sha256');
-      hash.update(password + salt);
+      hash.update(password + process.env.SALT_KEY);
       const hashedPassword = hash.digest('hex');
       return hashedPassword;
     },

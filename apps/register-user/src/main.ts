@@ -2,7 +2,9 @@ import { NativeConnection, Worker } from '@temporalio/worker';
 import { registerUserActivityFactory } from './activities';
 import { MongoClient } from 'mongodb';
 import { createTransport } from 'nodemailer';
-
+import { REGISTER_USER_QUEUE } from '@monorepo/interfaces';
+import { config } from 'dotenv';
+config();
 async function run() {
   const connection = await NativeConnection.connect({
     address: process.env.TEMPORAL_SERVER_ADDRESS,
@@ -19,7 +21,7 @@ async function run() {
   const worker = await Worker.create({
     connection,
     namespace: 'default',
-    taskQueue: 'register-user',
+    taskQueue: REGISTER_USER_QUEUE,
     workflowsPath: require.resolve('./workflows'),
     activities: registerUserActivityFactory(client, transport),
   });
