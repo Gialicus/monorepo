@@ -46,7 +46,6 @@ export async function subscriptionWorkflow(
   let isCanceled = false;
   workflow.setHandler(payedSignal, async ({ isAuto }) => {
     options.isPayed = true;
-    await sendSubscriptionRenewalMail(subscription.email);
     if (isAuto) {
       options.isAuto = isAuto;
       await sendAutopaymentMail(subscription.email);
@@ -69,6 +68,7 @@ export async function subscriptionWorkflow(
   }
   workflow.log.info('start billing cicle');
   while (options.isPayed) {
+    await sendSubscriptionRenewalMail(subscription.email);
     //azzero il pagamento e aspetto un periodo
     options.isPayed = false;
     await workflow.sleep(subscription.billingPeriod);
