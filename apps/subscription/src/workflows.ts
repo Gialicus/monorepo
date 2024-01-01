@@ -2,7 +2,7 @@ import * as workflow from '@temporalio/workflow';
 import { subscriptionActivityFactory } from './activities';
 
 const {
-  startTrialPeriod,
+  createSubscriptionPeriod,
   sendWelcomeMail,
   sendSubscriptionCancellationMail,
   sendSubscriptionRenewalMail,
@@ -53,7 +53,7 @@ export async function subscriptionWorkflow(
     isCanceled = true;
     await sendSubscriptionCancellationMail(subscription.email);
   });
-  const subscription = await startTrialPeriod(input.user_id);
+  const subscription = await createSubscriptionPeriod(input.user_id);
   if (options.isNew) {
     workflow.log.info('trial created');
     await sendWelcomeMail(input.email);

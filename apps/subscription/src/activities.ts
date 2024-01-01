@@ -12,7 +12,7 @@ export function subscriptionActivityFactory(
   transporter: Transporter
 ) {
   return {
-    startTrialPeriod: async (id: string | ObjectId) => {
+    createSubscriptionPeriod: async (id: string | ObjectId) => {
       const user = await findById(
         client.db().collection(MONGO_COLLECTIONS.USERS)
       )(id);
