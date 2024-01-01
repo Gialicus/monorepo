@@ -6,6 +6,7 @@ import {
   payedSignal,
   subscriptionWorkflow,
 } from '@monorepo/interfaces';
+import { IsAutoSchema } from '@monorepo/schemas';
 import { FastifyInstance } from 'fastify';
 
 export default async function (fastify: FastifyInstance) {
@@ -39,13 +40,7 @@ export default async function (fastify: FastifyInstance) {
     '/pay',
     {
       schema: {
-        body: {
-          type: 'object',
-          properties: {
-            isAuto: { type: 'boolean' },
-          },
-          required: ['isAuto'],
-        } as const,
+        body: IsAutoSchema,
       },
     },
     async function (request) {
