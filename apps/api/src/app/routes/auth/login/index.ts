@@ -24,7 +24,7 @@ const login: FastifyPluginAsync = async (fastify): Promise<void> => {
       ) {
         throw fastify.httpErrors.unauthorized;
       }
-      return { token: fastify.jwt.sign({ email }) };
+      return { token: fastify.jwt.sign({ id: user._id.toString(), email }) };
     }
   );
 };

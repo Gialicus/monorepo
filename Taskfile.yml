@@ -12,7 +12,11 @@ tasks:
     cmds:
       - npx nx run register-user:build && node ./dist/apps/register-user/main
 
+  subscription:
+    cmds:
+      - npx nx run subscription:build && node ./dist/apps/subscription/main
+
   all:
     cmds:
-      - npx nx run-many -t serve api register-user
+      - npx nx run-many -t serve api register-user subscription
 

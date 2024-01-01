@@ -1,7 +1,7 @@
 import { NativeConnection, Worker } from '@temporalio/worker';
 import { MongoClient } from 'mongodb';
 import { createTransport } from 'nodemailer';
-import { REGISTER_USER_QUEUE } from '@monorepo/interfaces';
+import { SUBSCRIPTION_QUEUE } from '@monorepo/interfaces';
 import { config } from 'dotenv';
 import { subscriptionActivityFactory } from './activities';
 
@@ -23,7 +23,7 @@ async function run() {
   const worker = await Worker.create({
     connection,
     namespace: 'default',
-    taskQueue: REGISTER_USER_QUEUE,
+    taskQueue: SUBSCRIPTION_QUEUE,
     workflowsPath: require.resolve('./workflows'),
     activities: subscriptionActivityFactory(client, transport),
   });

@@ -6,6 +6,9 @@ export type SubscriptionInput = {
 export type SubscriptionOutput = {
   status: string;
 };
+
+export const SUBSCRIPTION_QUEUE = 'subscription';
+
 export const cancelSignal = defineSignal('cancelSignal');
 export const payedSignal = defineSignal('payedSignal');
 

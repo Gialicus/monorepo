@@ -21,9 +21,9 @@ export function subscriptionActivityFactory(
         user_id: user._id,
         email: user.email,
         status: 'active',
-        trialPeriod: '5 minutes',
-        billingPeriod: '10 minutes',
-        extraPeriod: '2 minutes',
+        trialPeriod: '2 minutes',
+        billingPeriod: '2 minutes',
+        extraPeriod: '1 minute',
       };
       const trial = await createWithTimestamp<typeof payload>(
         client.db().collection(MONGO_COLLECTIONS.SUBSCRIPTIONS)
