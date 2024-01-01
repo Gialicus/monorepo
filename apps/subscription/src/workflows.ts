@@ -1,19 +1,6 @@
 import * as workflow from '@temporalio/workflow';
 import { subscriptionActivityFactory } from './activities';
 
-const {
-  createSubscriptionPeriod,
-  sendWelcomeMail,
-  sendSubscriptionCancellationMail,
-  sendSubscriptionRenewalMail,
-  sendAutopaymentMail,
-} = workflow.proxyActivities<ReturnType<typeof subscriptionActivityFactory>>({
-  startToCloseTimeout: '1 minute',
-  retry: {
-    nonRetryableErrorTypes: ['DuplicateNotAllowed'],
-  },
-});
-
 //Keep it in sync with interface and don't import from external sources
 type SubscriptionInput = {
   user_id: string;
@@ -32,22 +19,38 @@ type SubscriptionOutput = {
 //Keep it in sync with interface and don't import from external sources
 const cancelSignal = workflow.defineSignal('cancelSignal');
 //Keep it in sync with interface and don't import from external sources
-const payedSignal = workflow.defineSignal('payedSignal');
+export type PayedSignalInput = {
+  isAuto: boolean;
+};
 //Keep it in sync with interface and don't import from external sources
-const autoSignal = workflow.defineSignal('autoSignal');
+export const payedSignal =
+  workflow.defineSignal<[PayedSignalInput]>('payedSignal');
+
+const {
+  createSubscriptionPeriod,
+  sendWelcomeMail,
+  sendSubscriptionCancellationMail,
+  sendSubscriptionRenewalMail,
+  sendAutopaymentMail,
+} = workflow.proxyActivities<ReturnType<typeof subscriptionActivityFactory>>({
+  startToCloseTimeout: '1 minute',
+  retry: {
+    nonRetryableErrorTypes: ['DuplicateNotAllowed'],
+  },
+});
 
 export async function subscriptionWorkflow(
   input: SubscriptionInput,
   options: SubscriptionOption = { isNew: true, isPayed: false, isAuto: false }
 ): Promise<SubscriptionOutput> {
   let isCanceled = false;
-  workflow.setHandler(payedSignal, async () => {
+  workflow.setHandler(payedSignal, async ({ isAuto }) => {
     options.isPayed = true;
     await sendSubscriptionRenewalMail(subscription.email);
-  });
-  workflow.setHandler(autoSignal, async () => {
-    options.isAuto = true;
-    await sendAutopaymentMail(subscription.email);
+    if (isAuto) {
+      options.isAuto = isAuto;
+      await sendAutopaymentMail(subscription.email);
+    }
   });
   workflow.setHandler(cancelSignal, async () => {
     isCanceled = true;

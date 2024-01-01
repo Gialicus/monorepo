@@ -1,7 +1,6 @@
 import { JsonSchemaToTsProvider } from '@fastify/type-provider-json-schema-to-ts';
 import {
   SUBSCRIPTION_QUEUE,
-  autoSignal,
   cancelSignal,
   payedSignal,
   subscriptionWorkflow,
@@ -46,10 +45,7 @@ export default async function (fastify: FastifyInstance) {
     async function (request) {
       const { id } = request.user as Record<string, string>;
       const handle = app.temporal.workflow.getHandle(id);
-      await handle.signal(payedSignal);
-      if (request.body.isAuto) {
-        await handle.signal(autoSignal);
-      }
+      await handle.signal(payedSignal, { isAuto: request.body.isAuto });
       return { workflow: handle.workflowId };
     }
   );

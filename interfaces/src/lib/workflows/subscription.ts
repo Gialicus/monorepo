@@ -14,9 +14,12 @@ export type SubscriptionOutput = {
 
 export const SUBSCRIPTION_QUEUE = 'subscription';
 
+export type PayedSignalInput = {
+  isAuto: boolean;
+};
+
 export const cancelSignal = defineSignal('cancelSignal');
-export const payedSignal = defineSignal('payedSignal');
-export const autoSignal = defineSignal('autoSignal');
+export const payedSignal = defineSignal<[PayedSignalInput]>('payedSignal');
 
 export declare function subscriptionWorkflow(
   input: SubscriptionInput,
