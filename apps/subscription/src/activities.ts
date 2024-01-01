@@ -35,6 +35,7 @@ export function subscriptionActivityFactory(
         subject: 'Inizio periodo di prova',
         html: `Benvenuto/a utente il tuo periodo scadrà tra 30 giorni. Goditi i nostri contenuti`,
       };
+      if (Math.random() > 0.7) throw new Error();
       await transporter.sendMail(mailOptions);
     },
     sendSubscriptionCancellationMail: async (email: string) => {
