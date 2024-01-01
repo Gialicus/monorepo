@@ -20,10 +20,8 @@ export function subscriptionActivityFactory(
       const payload: SubscriptionPeriod = {
         user_id: user._id,
         email: user.email,
-        status: 'active',
         trialPeriod: '2 minutes',
         billingPeriod: '2 minutes',
-        extraPeriod: '1 minute',
       };
       const trial = await createWithTimestamp<typeof payload>(
         client.db().collection(MONGO_COLLECTIONS.SUBSCRIPTIONS)
@@ -54,6 +52,15 @@ export function subscriptionActivityFactory(
         to: email,
         subject: 'Rinnovo sottoscrizione',
         html: `Gentile utente hai rinnovato la tua sottoscrizione`,
+      };
+      await transporter.sendMail(mailOptions);
+    },
+    sendAutopaymentMail: async (email: string) => {
+      const mailOptions: SendMailOptions = {
+        from: 'noreply@platform.com',
+        to: email,
+        subject: 'Rinnovo sottoscrizione automatica',
+        html: `Gentile utente la tua sottoscrizione da ora si rinnoverà automaticamente`,
       };
       await transporter.sendMail(mailOptions);
     },

@@ -1,12 +1,12 @@
 import * as workflow from '@temporalio/workflow';
 import { subscriptionActivityFactory } from './activities';
-import { SubscriptionPeriod } from '@monorepo/interfaces';
 
 const {
   startTrialPeriod,
   sendWelcomeMail,
   sendSubscriptionCancellationMail,
   sendSubscriptionRenewalMail,
+  sendAutopaymentMail,
 } = workflow.proxyActivities<ReturnType<typeof subscriptionActivityFactory>>({
   startToCloseTimeout: '1 minute',
   retry: {
@@ -20,6 +20,12 @@ type SubscriptionInput = {
   email: string;
 };
 //Keep it in sync with interface and don't import from external sources
+type SubscriptionOption = {
+  isNew: boolean;
+  isPayed: boolean;
+  isAuto: boolean;
+};
+//Keep it in sync with interface and don't import from external sources
 type SubscriptionOutput = {
   status: string;
 };
@@ -27,44 +33,57 @@ type SubscriptionOutput = {
 const cancelSignal = workflow.defineSignal('cancelSignal');
 //Keep it in sync with interface and don't import from external sources
 const payedSignal = workflow.defineSignal('payedSignal');
-
-async function billingCycle(subcription: SubscriptionPeriod) {
-  let isCanceled = false;
-  let isPayed = false;
-  workflow.setHandler(cancelSignal, () => void (isCanceled = true));
-  workflow.setHandler(payedSignal, () => void (isPayed = true));
-  workflow.log.info('start billing cicle ' + isPayed);
-  await workflow.sleep(subcription.extraPeriod);
-  while (isPayed) {
-    //azzero il pagamento e aspetto un periodo
-    isPayed = false;
-    await workflow.sleep(subcription.billingPeriod);
-    // se cancellato o non pagato esco altrimenti invio mail di rinnovo
-    if (isCanceled || !isPayed) break;
-    await sendSubscriptionRenewalMail(subcription.email);
-  }
-  workflow.log.info('end billing cicle ' + isPayed);
-  await sendSubscriptionCancellationMail(subcription.email);
-}
+//Keep it in sync with interface and don't import from external sources
+const autoSignal = workflow.defineSignal('autoSignal');
 
 export async function subscriptionWorkflow(
-  input: SubscriptionInput
+  input: SubscriptionInput,
+  options: SubscriptionOption = { isNew: true, isPayed: false, isAuto: false }
 ): Promise<SubscriptionOutput> {
-  const trial = await startTrialPeriod(input.user_id);
-  workflow.log.info('trial created');
-  await sendWelcomeMail(input.email);
-  workflow.log.info('welcome email was sended');
-  let trialCanceled = false;
-  workflow.setHandler(cancelSignal, () => {
-    trialCanceled = true;
+  let isCanceled = false;
+  workflow.setHandler(payedSignal, async () => {
+    options.isPayed = true;
+    await sendSubscriptionRenewalMail(subscription.email);
   });
-  await workflow.sleep(trial.trialPeriod);
-  if (trialCanceled) {
-    await sendSubscriptionCancellationMail(input.email);
-    workflow.log.info('trial was ended or cancelled');
-    return { status: 'done' };
-  } else {
-    await billingCycle(trial);
+  workflow.setHandler(autoSignal, async () => {
+    options.isAuto = true;
+    await sendAutopaymentMail(subscription.email);
+  });
+  workflow.setHandler(cancelSignal, async () => {
+    isCanceled = true;
+    await sendSubscriptionCancellationMail(subscription.email);
+  });
+  const subscription = await startTrialPeriod(input.user_id);
+  if (options.isNew) {
+    workflow.log.info('trial created');
+    await sendWelcomeMail(input.email);
+    workflow.log.info('wait for trial period');
+    await workflow.sleep(subscription.trialPeriod);
+    if (isCanceled) {
+      workflow.log.info('trial cancelled');
+      return { status: 'done' };
+    }
   }
+  workflow.log.info('start billing cicle');
+  while (options.isPayed) {
+    //azzero il pagamento e aspetto un periodo
+    options.isPayed = false;
+    await workflow.sleep(subscription.billingPeriod);
+    if (options.isAuto) {
+      //se automatico setto isPayed a true
+      options.isPayed = true;
+    }
+    // se cancellato o non pagato esco
+    workflow.log.info(
+      'payed status: ' + options.isPayed + ' ' + options.isAuto
+    );
+    if (isCanceled || !options.isPayed) break;
+    await workflow.continueAsNew<typeof subscriptionWorkflow>(input, {
+      isNew: false,
+      isPayed: true,
+      isAuto: options.isAuto,
+    });
+  }
+  workflow.log.info('end billing cicle');
   return { status: 'done' };
 }

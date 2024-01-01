@@ -1,6 +1,7 @@
 import { JsonSchemaToTsProvider } from '@fastify/type-provider-json-schema-to-ts';
 import {
   SUBSCRIPTION_QUEUE,
+  autoSignal,
   payedSignal,
   subscriptionWorkflow,
 } from '@monorepo/interfaces';
@@ -26,16 +27,34 @@ export default async function (fastify: FastifyInstance) {
             user_id: id,
             email: email,
           },
+          { isNew: true, isPayed: false, isAuto: false },
         ],
         workflowId: id,
       }
     );
     return { workflow: handle.workflowId };
   });
-  app.post('/pay', async function (request) {
-    const { id } = request.user as Record<string, string>;
-    const handle = app.temporal.workflow.getHandle(id);
-    await handle.signal(payedSignal);
-    return { workflow: handle.workflowId };
-  });
+  app.post(
+    '/pay',
+    {
+      schema: {
+        body: {
+          type: 'object',
+          properties: {
+            isAuto: { type: 'boolean' },
+          },
+          required: ['isAuto'],
+        } as const,
+      },
+    },
+    async function (request) {
+      const { id } = request.user as Record<string, string>;
+      const handle = app.temporal.workflow.getHandle(id);
+      await handle.signal(payedSignal);
+      if (request.body.isAuto) {
+        await handle.signal(autoSignal);
+      }
+      return { workflow: handle.workflowId };
+    }
+  );
 }
