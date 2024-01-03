@@ -10,7 +10,7 @@ export type PaymentOptions = {
 };
 
 export type PaymentOutput = {
-  status: string;
+  status: 'done' | 'fail';
 };
 
 export class PaymentFailError extends Error {}

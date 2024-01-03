@@ -12,6 +12,7 @@ const { payOrder } = workflow.proxyActivities<
   startToCloseTimeout: '1 minute',
   retry: {
     maximumAttempts: 3,
+    initialInterval: '5 seconds',
   },
 });
 
@@ -26,8 +27,12 @@ export async function paymentWorkflow(
     if (error?.cause?.type === 'PaymentFailError') {
       workflow.log.info('PaymentFailError was catched start recounciliation');
       await deleteOrderIfExists(order._id);
+      return { status: 'fail' };
     }
   }
   await paymentSuccessMail(order.email);
+  workflow.log.info(
+    'Order with id: ' + order._id.toString() + ' finish successfully'
+  );
   return { status: 'done' };
 }
