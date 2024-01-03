@@ -55,8 +55,23 @@ export async function subscriptionWorkflow(
     options.isPayed = false;
     await workflow.sleep(subscription.billingPeriod);
     if (options.isAuto) {
-      //se automatico setto isPayed a true
-      options.isPayed = true;
+      const handle = await workflow.startChild('paymentWorkflow', {
+        taskQueue: 'payment',
+        args: [
+          {
+            user_id: input.user_id,
+            email: input.email,
+            target: 'sottoscrizione',
+            amount: 15,
+          },
+          {
+            isNew: true,
+          },
+        ],
+        workflowId: 'payment:' + input.user_id,
+      });
+      const payResult = await handle.result();
+      options.isPayed = payResult.status === 'done' ? true : false;
     }
     // se cancellato o non pagato esco
     workflow.log.info(

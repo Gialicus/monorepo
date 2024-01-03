@@ -28,7 +28,7 @@ export default async function (fastify: FastifyInstance) {
             isNew: true,
           },
         ],
-        workflowId: id,
+        workflowId: 'payment:' + id,
       }
     );
     return await handle.result();

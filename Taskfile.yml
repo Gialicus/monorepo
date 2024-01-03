@@ -27,5 +27,5 @@ tasks:
 
   demo:
     cmds:
-      - npx nx run-many -t serve api register-user subscription payment
+      - npx nx run-many -t serve api register-user subscription payment --parallel=5
 

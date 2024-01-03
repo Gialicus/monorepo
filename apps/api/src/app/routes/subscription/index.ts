@@ -1,8 +1,10 @@
 import { JsonSchemaToTsProvider } from '@fastify/type-provider-json-schema-to-ts';
 import {
+  PAYMENT_QUEUE,
   SUBSCRIPTION_QUEUE,
   cancelSignal,
   payedSignal,
+  paymentWorkflow,
   subscriptionWorkflow,
 } from '@monorepo/interfaces';
 import { IsAutoSchema } from '@monorepo/schemas';
@@ -30,7 +32,7 @@ export default async function (fastify: FastifyInstance) {
           },
           { isNew: true, isPayed: false, isAuto: false },
         ],
-        workflowId: id,
+        workflowId: 'subscription:' + id,
       }
     );
     return { workflow: handle.workflowId };
@@ -43,8 +45,30 @@ export default async function (fastify: FastifyInstance) {
       },
     },
     async function (request) {
-      const { id } = request.user as Record<string, string>;
-      const handle = app.temporal.workflow.getHandle(id);
+      const { id, email } = request.user as Record<string, string>;
+      const handle = app.temporal.workflow.getHandle('subscription:' + id);
+      const payedHandle = await app.temporal.workflow.start(
+        paymentWorkflow ?? 'paymentWorkflow',
+        {
+          taskQueue: PAYMENT_QUEUE,
+          args: [
+            {
+              user_id: id,
+              email: email,
+              target: 'pacchetto promo 1',
+              amount: 1500,
+            },
+            {
+              isNew: true,
+            },
+          ],
+          workflowId: 'payment:' + id,
+        }
+      );
+      const paymentResult = await payedHandle.result();
+      if (paymentResult.status === 'fail') {
+        throw fastify.httpErrors.insufficientStorage('Pagamento fallito');
+      }
       await handle.signal(payedSignal, { isAuto: request.body.isAuto });
       return { workflow: handle.workflowId };
     }
