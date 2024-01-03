@@ -4,6 +4,11 @@ tasks:
   lib:
     cmds:
       - npx nx run-many -t build interfaces database schemas
+
+  sync:
+    cmds:
+      - node scripts/syncinterface
+
   api:
     cmds:
       - npx nx run api:serve
@@ -16,7 +21,11 @@ tasks:
     cmds:
       - npx nx run subscription:build && node ./dist/apps/subscription/main
 
-  all:
+  payment:
     cmds:
-      - npx nx run-many -t serve api register-user subscription
+      - npx nx run payment:build && node ./dist/apps/payment/main
+
+  demo:
+    cmds:
+      - npx nx run-many -t serve api register-user subscription payment
 

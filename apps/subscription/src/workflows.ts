@@ -1,30 +1,12 @@
 import * as workflow from '@temporalio/workflow';
 import { subscriptionActivityFactory } from './activities';
-
-//Keep it in sync with interface and don't import from external sources
-type SubscriptionInput = {
-  user_id: string;
-  email: string;
-};
-//Keep it in sync with interface and don't import from external sources
-type SubscriptionOption = {
-  isNew: boolean;
-  isPayed: boolean;
-  isAuto: boolean;
-};
-//Keep it in sync with interface and don't import from external sources
-type SubscriptionOutput = {
-  status: string;
-};
-//Keep it in sync with interface and don't import from external sources
-const cancelSignal = workflow.defineSignal('cancelSignal');
-//Keep it in sync with interface and don't import from external sources
-export type PayedSignalInput = {
-  isAuto: boolean;
-};
-//Keep it in sync with interface and don't import from external sources
-export const payedSignal =
-  workflow.defineSignal<[PayedSignalInput]>('payedSignal');
+import {
+  SubscriptionInput,
+  SubscriptionOptions,
+  SubscriptionOutput,
+  cancelSignal,
+  payedSignal,
+} from './interface';
 
 const {
   createSubscriptionPeriod,
@@ -41,7 +23,7 @@ const {
 
 export async function subscriptionWorkflow(
   input: SubscriptionInput,
-  options: SubscriptionOption = { isNew: true, isPayed: false, isAuto: false }
+  options: SubscriptionOptions = { isNew: true, isPayed: false, isAuto: false }
 ): Promise<SubscriptionOutput> {
   let isCanceled = false;
   workflow.setHandler(payedSignal, async ({ isAuto }) => {

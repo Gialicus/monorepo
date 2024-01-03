@@ -1,5 +1,11 @@
 import * as workflow from '@temporalio/workflow';
 import type { registerUserActivityFactory } from './activities';
+import {
+  RegisterUserInput,
+  RegisterUserOutput,
+  activateUserSignal,
+  isActiveUserQuery,
+} from './interface';
 
 const {
   checkUserNotExists,
@@ -15,20 +21,6 @@ const {
   },
 });
 
-//Keep it in sync with interface and don't import from external sources
-type RegisterUserInput = {
-  email: string;
-  password: string;
-};
-//Keep it in sync with interface and don't import from external sources
-type RegisterUserOutput = {
-  status: string;
-};
-//Keep it in sync with interface and don't import from external sources
-const activateUserSignal = workflow.defineSignal('activateUserSignal');
-//Keep it in sync with interface and don't import from external sources
-const isActiveUserQuery = workflow.defineQuery('isActiveUserQuery');
-
 export async function registerUser(
   input: RegisterUserInput
 ): Promise<RegisterUserOutput> {
@@ -41,7 +33,7 @@ export async function registerUser(
     isActive = true;
   });
   workflow.setHandler(isActiveUserQuery, () => isActive);
-  if (await workflow.condition(() => isActive, 1000 * 60 * 3)) {
+  if (await workflow.condition(() => isActive, '3 minutes')) {
     await activateUser(user._id.toString());
   } else {
     await deactivateUser(user._id.toString());
