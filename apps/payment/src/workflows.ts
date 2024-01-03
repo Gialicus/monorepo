@@ -1,6 +1,6 @@
 import * as workflow from '@temporalio/workflow';
 import type { paymentActivityFactory } from './activities';
-import { PaymentInput, PaymentOutput } from './interface';
+import { PaymentInput, PaymentOutput } from './generated/payment';
 
 const { createPaymentOrder, deleteOrderIfExists, paymentSuccessMail } =
   workflow.proxyActivities<ReturnType<typeof paymentActivityFactory>>({

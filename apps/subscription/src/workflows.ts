@@ -6,7 +6,7 @@ import {
   SubscriptionOutput,
   cancelSignal,
   payedSignal,
-} from './interface';
+} from './generated/subscription';
 
 const {
   createSubscriptionPeriod,

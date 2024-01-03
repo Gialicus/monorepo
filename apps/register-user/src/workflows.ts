@@ -5,7 +5,7 @@ import {
   RegisterUserOutput,
   activateUserSignal,
   isActiveUserQuery,
-} from './interface';
+} from './generated/register-user';
 
 const {
   checkUserNotExists,
