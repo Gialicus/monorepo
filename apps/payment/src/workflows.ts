@@ -23,6 +23,7 @@ export async function paymentWorkflow(
   workflow.log.info('Order created with id: ' + order._id.toString());
   try {
     await payOrder(order._id);
+    //l'errore viene catchato dopo i 3 tentativi falliti di payorder
   } catch (error) {
     if (error?.cause?.type === 'PaymentFailError') {
       workflow.log.info('PaymentFailError was catched start recounciliation');
