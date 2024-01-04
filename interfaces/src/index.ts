@@ -5,3 +5,4 @@ export * from './lib/errors/not-found.error';
 export * from './lib/workflows/payment';
 export * from './lib/workflows/register-user';
 export * from './lib/workflows/subscription';
+export * from './lib/workflows/appointment';

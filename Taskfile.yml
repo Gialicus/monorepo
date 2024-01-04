@@ -25,7 +25,11 @@ tasks:
     cmds:
       - npx nx run payment:build && node ./dist/apps/payment/main
 
+  appointment:
+    cmds:
+      - npx nx run appointment:build && node ./dist/apps/appointment/main
+
   demo:
     cmds:
-      - npx nx run-many -t serve api register-user subscription payment --parallel=5
+      - npx nx run-many -t serve api register-user subscription payment appointment --parallel=5
 
