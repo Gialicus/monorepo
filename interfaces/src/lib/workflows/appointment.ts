@@ -18,8 +18,13 @@ export type AppointmentOutput = {
 
 export const APPOINTMENT_QUEUE = 'appointment';
 
-export const confirmSignal = defineSignal('confirmSignal');
-export const rejectSignal = defineSignal('rejectSignal');
+export type ConfirmSignalInput = {
+  id: string;
+};
+
+export const confirmSignal =
+  defineSignal<[ConfirmSignalInput]>('confirmSignal');
+export const rejectSignal = defineSignal<[ConfirmSignalInput]>('rejectSignal');
 export const outcomeSignal = defineSignal('outcomeSignal');
 
 export declare function appointmentWorkflow(

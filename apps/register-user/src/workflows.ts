@@ -21,7 +21,7 @@ const {
   },
 });
 
-export async function registerUser(
+export async function registerUserWorkflow(
   input: RegisterUserInput
 ): Promise<RegisterUserOutput> {
   await checkUserNotExists(input.email);

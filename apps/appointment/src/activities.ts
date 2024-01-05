@@ -26,7 +26,11 @@ export function appointmentActivityFactory(
       };
       await transporter.sendMail(mailOptions);
     },
-    sendMailToParticipant: async (id: string | ObjectId, date: Date) => {
+    sendMailToParticipant: async (
+      id: string | ObjectId,
+      date: Date,
+      workflowId: string
+    ) => {
       const user = await findById(
         client.db().collection(MONGO_COLLECTIONS.USERS)
       )(id);
@@ -36,12 +40,16 @@ export function appointmentActivityFactory(
         subject: 'appuntamento per il ' + date,
         html: `Appuntamento fissato per il ${date}.
         conferma la tua patecipazione:
-        <a href="http://localhost:3000/appointment/confirm/${id}">Conferma</a>
-        <a href="http://localhost:3000/appointment/reject/${id}">Rifiuta</a>`,
+        <a href="http://localhost:3000/appointment/confirm/${workflowId}">Conferma</a>
+        <a href="http://localhost:3000/appointment/reject/${workflowId}">Rifiuta</a>`,
       };
       await transporter.sendMail(mailOptions);
     },
-    sendReminder: async (id: string | ObjectId, date: Date) => {
+    sendReminder: async (
+      id: string | ObjectId,
+      date: Date,
+      workflowId: string
+    ) => {
       const user = await findById(
         client.db().collection(MONGO_COLLECTIONS.USERS)
       )(id);
@@ -51,12 +59,16 @@ export function appointmentActivityFactory(
         subject: "ti ricordiamo l'appuntamento per il " + date,
         html: `Ti ricordiamo l'appuntamento fissato per il ${date}.
         conferma la tua patecipazione:
-        <a href="http://localhost:3000/appointment/confirm/${id}">Conferma</a>
-        <a href="http://localhost:3000/appointment/reject/${id}">Rifiuta</a>`,
+        <a href="http://localhost:3000/appointment/confirm/${workflowId}">Conferma</a>
+        <a href="http://localhost:3000/appointment/reject/${workflowId}">Rifiuta</a>`,
       };
       await transporter.sendMail(mailOptions);
     },
-    sendOutcomeReminder: async (id: string | ObjectId, date: Date) => {
+    sendOutcomeReminder: async (
+      id: string | ObjectId,
+      date: Date,
+      workflowId: string
+    ) => {
       const user = await findById(
         client.db().collection(MONGO_COLLECTIONS.USERS)
       )(id);
@@ -65,8 +77,7 @@ export function appointmentActivityFactory(
         to: user.email,
         subject: "Conferma l'esito per l'appuntamento per il " + date,
         html: `Conferma l'esito per l'appuntamento fissato per il ${date}.
-        <a href="http://localhost:3000/appointment/outcome/confirm/${id}">Conferma</a>
-        <a href="http://localhost:3000/appointment/outcome/reject/${id}">Rifiuta</a>`,
+        <a href="http://localhost:3000/appointment/outcome/${workflowId}">Eseguito</a>`,
       };
       await transporter.sendMail(mailOptions);
     },
