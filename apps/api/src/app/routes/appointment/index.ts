@@ -6,24 +6,29 @@ import {
   outcomeSignal,
   rejectSignal,
 } from '@monorepo/interfaces';
-import { AppointmentSchema, IdSchema } from '@monorepo/schemas';
+import {
+  AppointmentConfirmSchema,
+  AppointmentRejectSchema,
+  AppointmentSchema,
+  IdSchema,
+} from '@monorepo/schemas';
 import { Duration } from '@temporalio/common';
 import { FastifyInstance } from 'fastify';
 
 export default async function (fastify: FastifyInstance) {
   const app = fastify.withTypeProvider<JsonSchemaToTsProvider>();
-  app.addHook('onRequest', async (req) => {
-    try {
-      await req.jwtVerify();
-    } catch (error) {
-      throw app.httpErrors.unauthorized;
-    }
-  });
   app.post(
     '/',
     {
       schema: {
         body: AppointmentSchema,
+      },
+      onRequest: async (req) => {
+        try {
+          await req.jwtVerify();
+        } catch (error) {
+          throw app.httpErrors.unauthorized;
+        }
       },
     },
     async function (request) {
@@ -48,36 +53,32 @@ export default async function (fastify: FastifyInstance) {
     }
   );
   app.get(
-    '/confirm/:id',
+    '/confirm/:id/:user',
     {
       schema: {
-        params: IdSchema,
+        params: AppointmentConfirmSchema,
       },
     },
     async function (request) {
       const wfId = request.params.id;
-      const index = wfId.lastIndexOf(':');
-      const userId = wfId.slice(index);
-      console.log('USER ID', userId);
+      const user = request.params.user;
       const handle = app.temporal.workflow.getHandle(wfId);
-      await handle.signal(confirmSignal, { id: userId });
+      await handle.signal(confirmSignal, { id: user });
       return { workflow: handle.workflowId };
     }
   );
   app.get(
-    '/reject/:id',
+    '/reject/:id/:user',
     {
       schema: {
-        params: IdSchema,
+        params: AppointmentRejectSchema,
       },
     },
     async function (request) {
       const wfId = request.params.id;
-      const index = wfId.lastIndexOf(':');
-      const userId = wfId.slice(index);
-      console.log('USER ID', userId);
+      const user = request.params.user;
       const handle = app.temporal.workflow.getHandle(wfId);
-      await handle.signal(rejectSignal, { id: userId });
+      await handle.signal(rejectSignal, { id: user });
       return { workflow: handle.workflowId };
     }
   );

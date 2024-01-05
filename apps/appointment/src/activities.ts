@@ -40,8 +40,8 @@ export function appointmentActivityFactory(
         subject: 'appuntamento per il ' + date,
         html: `Appuntamento fissato per il ${date}.
         conferma la tua patecipazione:
-        <a href="http://localhost:3000/appointment/confirm/${workflowId}">Conferma</a>
-        <a href="http://localhost:3000/appointment/reject/${workflowId}">Rifiuta</a>`,
+        <a href="http://localhost:3000/appointment/confirm/${workflowId}/${user._id.toString()}">Conferma</a>
+        <a href="http://localhost:3000/appointment/reject/${workflowId}/${user._id.toString()}">Rifiuta</a>`,
       };
       await transporter.sendMail(mailOptions);
     },
@@ -59,8 +59,8 @@ export function appointmentActivityFactory(
         subject: "ti ricordiamo l'appuntamento per il " + date,
         html: `Ti ricordiamo l'appuntamento fissato per il ${date}.
         conferma la tua patecipazione:
-        <a href="http://localhost:3000/appointment/confirm/${workflowId}">Conferma</a>
-        <a href="http://localhost:3000/appointment/reject/${workflowId}">Rifiuta</a>`,
+        <a href="http://localhost:3000/appointment/confirm/${workflowId}/${user._id.toString()}">Conferma</a>
+        <a href="http://localhost:3000/appointment/reject/${workflowId}/${user._id.toString()}">Rifiuta</a>`,
       };
       await transporter.sendMail(mailOptions);
     },
